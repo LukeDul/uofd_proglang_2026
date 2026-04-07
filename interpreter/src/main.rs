@@ -71,20 +71,30 @@ fn evaluate(expression: &Expression, environment: &Environment) -> i32 {
 }
 
 fn main() {
-    let mut expressions = Vec::new();
-    expressions.push(Expression::Number(3));
-    expressions.push(Expression::Number(4));
-    expressions.push(Expression::Number(5));
-    let add = Expression::Add(expressions);
-    let multiply = Expression::Multiply(vec![add, Expression::Number(2)]);
-    let result = evaluate(&multiply, &Environment::new());
-    println!("The result is {result}");
+    let product = Expression::Multiply(vec![
+        Expression::Number(10),
+        Expression::Number(3),
+    ]);
+    let sum = Expression::Add(vec![
+        Expression::Number(2),
+        Expression::Number(5),
+    ]);
+    let x = Expression::Variable(String::from("x"));
 
+    let expr = Expression::Subtract(vec![product, sum, x]);
+
+    let env = Environment {
+        key: String::from("x"),
+        value: Expression::Number(1),
+    };
+
+    let result = evaluate(&expr, &env);
+    println!("(10 * 3) - (2 + 5) - x  where x=1  =>  {result}");
 }
 
 #[cfg(test)]
 mod tests {
-use crate::{evaluate_addition, evaluate_subtraction, Expression};
+use crate::{evaluate_addition, evaluate_multiplication, evaluate_subtraction, Expression};
     #[test]
     fn it_works() {
         assert_eq!(2+2, 4);
@@ -164,7 +174,26 @@ use crate::{evaluate_addition, evaluate_subtraction, Expression};
         assert_eq!(value, 13);
     }
 
+    #[test]
+    fn test_subexpressions() {
+        let inner_add = Expression::Add(vec![
+            Expression::Number(2),
+            Expression::Number(2),
+        ]);
+        let expr = Expression::Multiply(vec![
+            Expression::Number(3),
+            Expression::Number(4),
+            Expression::Number(5),
+            inner_add,
+        ]);
+
+        let result = evaluate_multiplication(&expr, &crate::Environment::new());
+
+        assert_eq!(result, 240);
+    }
+
 }
+
 
 
 
