@@ -86,6 +86,33 @@ fn evaluate(expression: &Expression, environment: &Environment) -> i32 {
     }
 }
 
+pub fn print_expression(expression: &Expression) -> String {
+    match expression {
+        Expression::Number(n) => format!("{}", n),
+        Expression::Variable(name) => name.clone(),
+        Expression::Add(exprs) => {
+            let args: Vec<String> = exprs.iter().map(|e| print_expression(e)).collect();
+            format!("(+ {})", args.join(" "))
+        }
+        Expression::Subtract(exprs) => {
+            let args: Vec<String> = exprs.iter().map(|e| print_expression(e)).collect();
+            format!("(- {})", args.join(" "))
+        }
+        Expression::Multiply(exprs) => {
+            let args: Vec<String> = exprs.iter().map(|e| print_expression(e)).collect();
+            format!("(* {})", args.join(" "))
+        }
+        Expression::Divide(exprs) => {
+            let args: Vec<String> = exprs.iter().map(|e| print_expression(e)).collect();
+            format!("(/ {})", args.join(" "))
+        }
+    }
+}
+
+pub fn print_environment(env: &Environment) -> String {
+    format!("(define {} {})", env.key, print_expression(&env.value))
+}
+
 fn main() {
     let quotient = Expression::Divide(vec![
       Expression::Number(100),
@@ -110,7 +137,10 @@ fn main() {
     };
 
     let result = evaluate(&quotient, &env);
-    println!("{result}");
+
+    println!("{}", print_expression(&expr));
+    println!("{}", print_environment(&env));
+
 }
 
 #[cfg(test)]
